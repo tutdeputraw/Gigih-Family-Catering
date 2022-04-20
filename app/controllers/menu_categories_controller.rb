@@ -7,6 +7,14 @@ class MenuCategoriesController < ApplicationController
     }
   end
 
+  def show
+    @menu_category = MenuCategory.find(params['id'])
+
+    render :json => {
+      data: @menu_category
+    }
+  end
+
   def create
     @menu_category = MenuCategory.new(menu_category_params)
 
