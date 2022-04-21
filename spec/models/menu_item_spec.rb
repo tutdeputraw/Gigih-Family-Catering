@@ -17,4 +17,12 @@ RSpec.describe MenuItem, type: :model do
 
     expect(menu2.errors[:name]).to include("has already been taken")
   end
+
+  it 'The menu model does not accept the price field with values less than 0.01' do
+    menu = MenuItem.create(name: 'menu1', price: 0.0001, description: 'asdasdadasdasdas')
+
+    menu.valid?
+
+    expect(menu.errors[:price]).to include("must be greater than or equal to 0.01")
+  end
 end
