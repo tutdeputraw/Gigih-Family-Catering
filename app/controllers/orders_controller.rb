@@ -19,32 +19,12 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @orders = Order.create(
-      email: params['email'],
-      total_price: 0,
-      status: 'NEW'
-    )
+    create_order
+    create_order_items
 
-    total_price = 0
-
-    params[:items].each do |item|
-      menu_item = MenuItem.find(item[:id])
-      total_price = total_price + (menu_item.price * item[:quantity])
-
-      OrderItem.create(
-        menu_item: menu_item,
-        order: @orders,
-        item_price: menu_item.price,
-        quantity: item[:quantity]
-      )
-    end
-
-    @orders = Order.find(@orders.id)
-    @orders.total_price = total_price
-    @orders.save
+    update_total_price(get_total_price)
 
     render :json => {
-      x: total_price,
       message: 'new record successfully created',
       data: @orders
     }, include: [
@@ -64,6 +44,46 @@ class OrdersController < ApplicationController
 
   def has_range_date_param?
     params.has_key?(:start_date) && params.has_key?(:end_date)
+  end
+
+  def create_order
+    @orders = Order.create(
+      email: params['email'],
+      status: 'NEW'
+    )
+  end
+
+  def create_order_items
+    params[:items].each do |item|
+      menu_item = MenuItem.find(item[:id])
+
+      OrderItem.create(
+        menu_item: menu_item,
+        order: @orders,
+        item_price: menu_item.price,
+        quantity: item[:quantity]
+      )
+    end
+  end
+
+  def get_total_price
+    total_price = 0
+
+    @orders.order_items.each do |order_item|
+      total_price = total_price + calculate_price(order_item)
+    end
+
+    total_price
+  end
+
+  def calculate_price(order_item)
+    order_item.item_price * order_item.quantity
+  end
+
+  def update_total_price(total_price)
+    @orders = Order.find(@orders.id)
+    @orders.total_price = total_price
+    @orders.save
   end
 end
 
