@@ -25,4 +25,14 @@ RSpec.describe MenuItem, type: :model do
 
     expect(menu.errors[:price]).to include("must be greater than or equal to 0.01")
   end
+
+  it 'The menu model does not accept the description field with values length is more than equal to 150' do
+    menu = MenuItem.create(name: 'menu1',
+                           price: 0.0001,
+                           description: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
+    menu.valid?
+
+    expect(menu.errors[:description]).to include("is too long (maximum is 150 characters)")
+  end
 end
