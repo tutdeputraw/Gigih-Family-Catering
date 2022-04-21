@@ -1,24 +1,32 @@
 class MenuItemsController < ApplicationController
   def index
-    @menu_items = MenuItem.all
+    begin
+      @menu_items = MenuItem.all
 
-    render :json => {
-      message: '',
-      data: @menu_items
-    }, include: [
-      :menu_categories => { :only => [:id, :name] }
-    ]
+      render :json => {
+        message: '',
+        data: @menu_items
+      }, include: [
+        :menu_categories => { :only => [:id, :name] }
+      ]
+    rescue Exception => e
+      render_error(e.message)
+    end
   end
 
   def show
-    @menu_items = MenuItem.find(params['id'])
+    begin
+      @menu_items = MenuItem.find(params['id'])
 
-    render :json => {
-      message: '',
-      data: @menu_items
-    }, include: [
-      :menu_categories => { :only => [:id, :name] }
-    ]
+      render :json => {
+        message: '',
+        data: @menu_items
+      }, include: [
+        :menu_categories => { :only => [:id, :name] }
+      ]
+    rescue Exception => e
+      render_error(e.message)
+    end
   end
 
   def create
@@ -32,15 +40,10 @@ class MenuItemsController < ApplicationController
           data: @menu_items
         }
       else
-        render :json => {
-          message: 'error has occured',
-          errors: @menu_items.errors
-        }
+        render_error(@menu_items.errors)
       end
     rescue Exception => e
-      render :json => {
-        errors: e.message
-      }
+      render_error(e.message)
     end
   end
 
@@ -58,22 +61,28 @@ class MenuItemsController < ApplicationController
         }, include: [
           :menu_categories => { :only => [:id, :name] }
         ]
+      else
+        render_error(@menu_items.errors)
       end
     rescue Exception => e
-      render :json => {
-        errors: e.message
-      }
+      render_error(e.message)
     end
   end
 
   def destroy
-    @menu_items = MenuItem.find(params['id'])
-    @menu_items.menu_categories.clear
+    begin
+      @menu_items = MenuItem.find(params['id'])
+      @menu_items.menu_categories.clear
 
-    if @menu_items.destroy
-      render :json => {
-        message: 'the record successfully deleted',
-      }
+      if @menu_items.destroy
+        render :json => {
+          message: 'the record successfully deleted',
+        }
+      else
+        render_error(@menu_items.errors)
+      end
+    rescue Exception => e
+      render_error(e.message)
     end
   end
 
@@ -81,5 +90,12 @@ class MenuItemsController < ApplicationController
 
   def menu_item_params
     params.permit(:name, :price, :description)
+  end
+
+  def render_error(error)
+    render :json => {
+      message: 'error has occured',
+      errors: error
+    }
   end
 end
