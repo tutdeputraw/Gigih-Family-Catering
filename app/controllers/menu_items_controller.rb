@@ -30,6 +30,10 @@ class MenuItemsController < ApplicationController
         message: 'new record successfully created',
         data: @menu_items
       }
+    else
+      render :json => {
+        errors: @menu_items.errors
+      }, :status => 400
     end
   end
 
