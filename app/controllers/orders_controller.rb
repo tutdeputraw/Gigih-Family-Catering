@@ -21,12 +21,15 @@ class OrdersController < ApplicationController
   def create
     @orders = Order.create(
       email: params['email'],
-      total_price: 233,
+      total_price: 0,
       status: 'NEW'
     )
 
+    total_price = 0
+
     params[:items].each do |item|
       menu_item = MenuItem.find(item[:id])
+      total_price = total_price + (menu_item.price * item[:quantity])
 
       OrderItem.create(
         menu_item: menu_item,
@@ -36,11 +39,16 @@ class OrdersController < ApplicationController
       )
     end
 
+    @orders = Order.find(@orders.id)
+    @orders.total_price = total_price
+    @orders.save
+
     render :json => {
+      x: total_price,
       message: 'new record successfully created',
       data: @orders
     }, include: [
-      :order_items
+      :order_items => { :only => [:menu_item_id, :item_price, :quantity] }
     ]
   end
 
