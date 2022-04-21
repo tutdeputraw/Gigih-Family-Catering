@@ -22,7 +22,7 @@ class MenuItemsController < ApplicationController
   def create
     begin
       @menu_items = MenuItem.new(menu_item_params)
-      @menu_items.menu_categories << MenuCategory.where(id: params['menu_category_id'])
+      add_item_categories
 
       if @menu_items.save
         render_response('new record has successfully created')
@@ -37,9 +37,9 @@ class MenuItemsController < ApplicationController
   def update
     begin
       @menu_items = MenuItem.find(params['id'])
-
       @menu_items.update(menu_item_params)
-      @menu_items.menu_categories.replace(MenuCategory.where(id: params['menu_category_id']))
+
+      update_item_categories
 
       if @menu_items.save
         render_response('the record has successfully updated')
@@ -66,6 +66,14 @@ class MenuItemsController < ApplicationController
   end
 
   private
+
+  def add_item_categories
+    @menu_items.menu_categories << MenuCategory.where(id: params['menu_category_id'])
+  end
+
+  def update_item_categories
+    @menu_items.menu_categories.replace(MenuCategory.where(id: params['menu_category_id']))
+  end
 
   def menu_item_params
     params.permit(:name, :price, :description)
