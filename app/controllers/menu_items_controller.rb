@@ -22,18 +22,24 @@ class MenuItemsController < ApplicationController
   end
 
   def create
-    @menu_items = MenuItem.new(menu_item_params)
-    @menu_items.menu_categories << MenuCategory.where(id: params['menu_category_id'])
+    begin
+      @menu_items = MenuItem.new(menu_item_params)
+      @menu_items.menu_categories << MenuCategory.where(id: params['menu_category_id'])
 
-    if @menu_items.save
+      if @menu_items.save
+        render :json => {
+          message: 'new record successfully created',
+          data: @menu_items
+        }
+      else
+        render :json => {
+          message: 'error has occured',
+          errors: @menu_items.errors
+        }
+      end
+    rescue Exception => e
       render :json => {
-        message: 'new record successfully created',
-        data: @menu_items
-      }
-    else
-      render :json => {
-        message: 'error has occured',
-        errors: @menu_items.errors
+        errors: e.message
       }
     end
   end
