@@ -32,24 +32,31 @@ class MenuItemsController < ApplicationController
       }
     else
       render :json => {
+        message: 'error has occured',
         errors: @menu_items.errors
-      }, :status => 400
+      }
     end
   end
 
   def update
-    @menu_items = MenuItem.find(params['id'])
+    begin
+      @menu_items = MenuItem.find(params['id'])
 
-    @menu_items.update(menu_item_params)
-    @menu_items.menu_categories.replace(MenuCategory.where(id: params['menu_category_id']))
+      @menu_items.update(menu_item_params)
+      @menu_items.menu_categories.replace(MenuCategory.where(id: params['menu_category_id']))
 
-    if @menu_items.save
+      if @menu_items.save
+        render :json => {
+          message: 'the record successfully updated',
+          data: @menu_items
+        }, include: [
+          :menu_categories => { :only => [:id, :name] }
+        ]
+      end
+    rescue Exception => e
       render :json => {
-        message: 'the record successfully updated',
-        data: @menu_items
-      }, include: [
-        :menu_categories => { :only => [:id, :name] }
-      ]
+        errors: e.message
+      }
     end
   end
 
