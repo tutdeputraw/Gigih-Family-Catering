@@ -1,28 +1,40 @@
 class MenuCategoriesController < ApplicationController
   def index
-    @menu_categories = MenuCategory.all
+    begin
+      @menu_categories = MenuCategory.all
 
-    render :json => {
-      data: @menu_categories
-    }
+      render :json => {
+        data: @menu_categories
+      }
+    rescue Exception => e
+      render_error(e.message)
+    end
   end
 
   def show
-    @menu_category = MenuCategory.find(params['id'])
+    begin
+      @menu_category = MenuCategory.find(params['id'])
 
-    render :json => {
-      data: @menu_category
-    }
+      render :json => {
+        data: @menu_category
+      }
+    rescue Exception => e
+      render_error(e.message)
+    end
   end
 
   def create
-    @menu_category = MenuCategory.new(menu_category_params)
+    begin
+      @menu_category = MenuCategory.new(menu_category_params)
 
-    if @menu_category.save
-      render :json => {
-        message: 'menu created',
-        data: @menu_category
-      }
+      if @menu_category.save
+        render :json => {
+          message: 'menu created',
+          data: @menu_category
+        }
+      end
+    rescue Exception => e
+      render_error(e.message)
     end
   end
 
@@ -30,5 +42,12 @@ class MenuCategoriesController < ApplicationController
 
   def menu_category_params
     params.require(:menu_category).permit(:name)
+  end
+
+  def render_error(error)
+    render :json => {
+      message: 'error has occurred',
+      errors: error
+    }
   end
 end
