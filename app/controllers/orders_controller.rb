@@ -24,7 +24,16 @@ class OrdersController < ApplicationController
 
   def create
     begin
-      create_order
+      @orders = Order.new(
+        email: params['email'],
+        total_price: 0,
+        status: 'NEW'
+      )
+
+      unless @orders.save
+        render_error(@orders.errors) and return
+      end
+
       create_order_items
 
       update_total_price(get_total_price)
@@ -35,8 +44,8 @@ class OrdersController < ApplicationController
       }, include: [
         :order_items => { :only => [:menu_item_id, :item_price, :quantity] }
       ]
-    rescue Exception => e
-      render_error(e.message)
+      rescue Exception => e
+        render_error(e.message)
     end
   end
 
@@ -59,13 +68,6 @@ class OrdersController < ApplicationController
       message: 'error has occurred',
       errors: error
     }
-  end
-
-  def create_order
-    @orders = Order.create(
-      email: params['email'],
-      status: 'NEW'
-    )
   end
 
   def create_order_items
