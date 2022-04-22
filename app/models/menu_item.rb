@@ -11,5 +11,5 @@ class MenuItem < ApplicationRecord
 
   validates :description, :length => { :maximum => 150 }, presence: true
 
-  validates :item_categories, presence: true
+  # validates :item_categories, presence: true
 end
