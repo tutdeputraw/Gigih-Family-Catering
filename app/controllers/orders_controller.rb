@@ -11,12 +11,7 @@ class OrdersController < ApplicationController
         @orders = Order.all
       end
 
-      render :json => {
-        message: '',
-        data: @orders
-      }, :include => [
-        :order_items
-      ]
+      render_response
     rescue Exception => e
       render_error(e.message)
     end
@@ -38,14 +33,9 @@ class OrdersController < ApplicationController
 
       update_total_price(get_total_price)
 
-      render :json => {
-        message: 'new record successfully created',
-        data: @orders
-      }, include: [
-        :order_items => { :only => [:menu_item_id, :item_price, :quantity] }
-      ]
-      rescue Exception => e
-        render_error(e.message)
+      render_response
+    rescue Exception => e
+      render_error(e.message)
     end
   end
 
@@ -68,6 +58,15 @@ class OrdersController < ApplicationController
       message: 'error has occurred',
       errors: error
     }
+  end
+
+  def render_response
+    render :json => {
+      message: 'new record successfully created',
+      data: @orders
+    }, include: [
+      :order_items => { :only => [:menu_item_id, :item_price, :quantity] }
+    ]
   end
 
   def create_order_items
