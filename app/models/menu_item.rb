@@ -1,5 +1,5 @@
 class MenuItem < ApplicationRecord
-  has_many :item_categories, dependent: :destroy
+  has_many :item_categories
   has_many :menu_categories, through: :item_categories
 
   has_many :order_items
@@ -7,7 +7,9 @@ class MenuItem < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
 
-  validates_numericality_of :price, greater_than_or_equal_to: 0.01
+  validates_numericality_of :price, greater_than_or_equal_to: 0.01, presence: true
 
-  validates :description, :length => { :maximum => 150 }
+  validates :description, :length => { :maximum => 150 }, presence: true
+
+  validates :item_categories, presence: true
 end

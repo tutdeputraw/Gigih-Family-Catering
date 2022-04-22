@@ -69,11 +69,11 @@ class MenuItemsController < ApplicationController
   private
 
   def add_item_categories
-    @menu_items.menu_categories << MenuCategory.where(id: params['menu_category_id'])
+    @menu_items.menu_categories << MenuCategory.where(id: params['item_categories'])
   end
 
   def update_item_categories
-    @menu_items.menu_categories.replace(MenuCategory.where(id: params['menu_category_id']))
+    @menu_items.menu_categories.replace(MenuCategory.where(id: params['item_categories']))
   end
 
   def menu_item_params
