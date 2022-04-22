@@ -6,4 +6,6 @@ class Order < ApplicationRecord
     with: /\A[\w+\-.]+@[a-z\d\-.]+\.[c][o][m]\z/,
     message: 'wrong format'
   }
+
+  validates :status, presence:true, inclusion: { in: %w(NEW PAID CANCELED) }
 end
