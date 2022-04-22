@@ -1,11 +1,11 @@
 class OrdersController < ApplicationController
   def index
     begin
-      if has_email_param?
+      if has_param?('email')
         @orders = Order.where(:email => params[:email])
-      elsif has_total_price_param?
+      elsif has_param?('total_price')
         @orders = Order.where('total_price > ?', params[:total_price])
-      elsif has_range_date_param?
+      elsif has_param?('start_date') && has_param?('end_date')
         @orders = Order.where(:created_at => params[:start_date]..params[:end_date])
       else
         @orders = Order.all
@@ -39,18 +39,30 @@ class OrdersController < ApplicationController
     end
   end
 
+  def update
+    begin
+      unless has_param?('status')
+        render_error("body query 'status' is required to update the order status") and return
+      end
+
+      @orders = Order.find(params['id'])
+
+      @orders.update_attribute(:status, params['status'])
+
+      if @orders.save
+        render_response
+      else
+        render_error(@orders.errors)
+      end
+    rescue Exception => e
+      render_error(e.message)
+    end
+  end
+
   private
 
-  def has_email_param?
-    params.has_key?(:email)
-  end
-
-  def has_total_price_param?
-    params.has_key?(:total_price)
-  end
-
-  def has_range_date_param?
-    params.has_key?(:start_date) && params.has_key?(:end_date)
+  def has_param?(keyword)
+    params.has_key?(keyword)
   end
 
   def render_error(error)
