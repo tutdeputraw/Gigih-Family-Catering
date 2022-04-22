@@ -11,7 +11,7 @@ class OrdersController < ApplicationController
         @orders = Order.all
       end
 
-      render_response
+      render_response('')
     rescue Exception => e
       render_error(e.message)
     end
@@ -33,7 +33,7 @@ class OrdersController < ApplicationController
 
       update_total_price(get_total_price)
 
-      render_response
+      render_response('new record has successfully created')
     rescue Exception => e
       render_error(e.message)
     end
@@ -50,7 +50,7 @@ class OrdersController < ApplicationController
       @orders.update_attribute(:status, params['status'])
 
       if @orders.save
-        render_response
+        render_response('the record has successfully updated')
       else
         render_error(@orders.errors)
       end
@@ -72,9 +72,9 @@ class OrdersController < ApplicationController
     }
   end
 
-  def render_response
+  def render_response(message)
     render :json => {
-      message: 'new record successfully created',
+      message: message,
       data: @orders
     }, include: [
       :order_items => { :only => [:menu_item_id, :item_price, :quantity] }
