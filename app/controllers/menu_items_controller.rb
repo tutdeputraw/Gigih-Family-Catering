@@ -54,6 +54,7 @@ class MenuItemsController < ApplicationController
   def destroy
     begin
       @menu_items = MenuItem.find(params['id'])
+      @menu_items.menu_categories.clear
 
       if @menu_items.destroy
         render_response('the record successfully deleted')
