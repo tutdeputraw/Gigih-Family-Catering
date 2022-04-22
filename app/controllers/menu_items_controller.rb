@@ -81,7 +81,7 @@ class MenuItemsController < ApplicationController
 
   def render_error(error)
     render :json => {
-      message: 'error has occured',
+      message: 'error has occurred',
       errors: error
     }
   end
